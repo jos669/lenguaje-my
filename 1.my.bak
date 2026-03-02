@@ -1,0 +1,261 @@
+# ============================================================
+#  TODO_INCLUIDO.MY
+#  Demostración completa de Mi Lenguaje 🇪🇸
+#  Incluye: Sintaxis básica, Fase 9 (concisa),
+#           Enterprise (Fase 6), IA/ML (Fase 7),
+#           Avanzadas (Fase 8) y más.
+# ============================================================
+
+imprimir("🚀 Iniciando demostración completa de Mi Lenguaje")
+imprimir("==================================================")
+
+# ------------------------------------------------------------------
+# 1. SINTAXIS BÁSICA (Core)
+# ------------------------------------------------------------------
+
+imprimir("\n📌 1. SINTAXIS BÁSICA")
+
+# Variables con y sin tipo
+definir nombre = "Mundo"
+definir edad: entero = 25
+definir altura: flotante = 1.75
+definir activo: booleano = verdadero
+
+imprimir(f"Hola, {nombre}! Edad: {edad}, Altura: {altura}, Activo: {activo}")
+
+# Función tradicional
+función saludar(n: cadena) -> cadena:
+    retornar "¡Hola, " + n + "!"
+
+imprimir(saludar("Estudiante"))
+
+# Clase y herencia
+clase Animal:
+    función __init__(self, nombre):
+        self.nombre = nombre
+    
+    función hablar(self) -> cadena:
+        retornar "..."
+
+clase Perro(Animal):
+    función hablar(self) -> cadena:
+        retornar "Guau!"
+
+perro = Perro("Rex")
+imprimir(f"{perro.nombre} dice: {perro.hablar()}")
+
+# Condicional si/sino
+si edad >= 18:
+    imprimir("Eres mayor de edad")
+sino:
+    imprimir("Eres menor")
+
+# Bucle para
+para i en rango(3):
+    imprimir(f"  Iteración {i}")
+
+# Manejo de errores
+intentar:
+    resultado = 10 / 0
+excepto ErrorDivision:
+    imprimir("  ⚠️  No se puede dividir por cero")
+finalmente:
+    imprimir("  ✅ Bloque finally ejecutado")
+
+# Gestor de contexto (simulado con archivo en memoria)
+con abrir("ejemplo.txt", "w") como f:
+    f.escribir("Texto de prueba")
+imprimir("  📁 Contexto cerrado automáticamente")
+
+# Async/await (simulado)
+# asíncrono función tarea_asincrona():
+#     esperar asíncrono dormir(0.1)
+#     retornar "Hecho"
+# asíncrono función probar_async():
+#     resultado = esperar tarea_asincrona()
+#     imprimir(f"  ⚡ Async: {resultado}")
+# probar_async()
+
+# ------------------------------------------------------------------
+# 2. NOVEDADES FASE 9 - SINTAXIS CONCISA
+# ------------------------------------------------------------------
+imprimir("\n📌 2. SINTAXIS CONCISA (FASE 9)")
+
+# Arrow function
+suma = fn(a,b) => a + b
+imprimir(f"  ➕ Arrow suma(5,3) = {suma(5,3)}")
+
+# Range shorthand
+imprimir("  🔢 Range 1..5: ", end="")
+para i en 1..5:
+    imprimir(i, end=" ")
+imprimir()
+
+# Ternario inline
+edad_prueba = 20
+estado = ?edad_prueba >= 18: "mayor" sino: "menor"
+imprimir(f"  ❓ Ternario: {estado}")
+
+# List comprehension corta
+numeros = [1,2,3,4,5]
+dobles = [x*2 p x en numeros]
+imprimir(f"  📋 Lista corta (dobles): {dobles}")
+
+# SQL-like query
+mayores = selecciona x de numeros donde x > 3
+imprimir(f"  🔍 SQL-like (x>3): {mayores}")
+
+# Pattern matching (Python 3.10+ requerido)
+# dia = 2
+# match dia:
+#     caso 1: imprimir("  🗓️  Lunes")
+#     caso 2: imprimir("  🗓️  Martes")
+#     predeterminado: imprimir("  🗓️  Otro día")
+
+# Try-catch inline
+# resultado = funcion_riesgosa() ! 999
+# imprimir(f"  🛡️  Try inline (default): {resultado}")
+
+# Paralelismo simple (simulado, en real lanzaría threads)
+# lista_par = [1,2,3,4]
+# paralelo para i en lista_par:
+#     imprimir(f"    🧵 Procesando {i} en paralelo")
+
+# ------------------------------------------------------------------
+# 3. CARACTERÍSTICAS ENTERPRISE (FASE 6)
+# ------------------------------------------------------------------
+imprimir("\n📌 3. CARACTERÍSTICAS ENTERPRISE (FASE 6)")
+
+# Sistema de logging integrado
+desde core.logging importar info
+info("Este es un mensaje de log")
+
+# Afirmaciones (testing)
+afirmar(2 + 2 == 4, "Las matemáticas funcionan")
+
+# Generación de documentación (solo se invoca desde CLI, pero aquí usamos el módulo)
+# Ejemplo de uso del perfilador (simulado)
+desde core.profiler importar Profiler
+perfil = Profiler()
+perfil.iniciar()
+para i en rango(1000): _ = i*i
+perfil.detener()
+estadisticas = perfil.obtener_estadisticas()
+imprimir(f"  ⏱️  Perfilador: {estadisticas}")
+
+# ------------------------------------------------------------------
+# 4. INTELIGENCIA ARTIFICIAL / ML (FASE 7)
+# ------------------------------------------------------------------
+imprimir("\n📌 4. IA Y MACHINE LEARNING (FASE 7)")
+
+desde core.ai importar RedNeuronal, ClasificadorIA
+desde core.ml importar KMeans
+desde core.nlp importar AnalizadorSentimiento, tokenizar
+
+# Red Neuronal (XOR)
+red = RedNeuronal([2, 4, 1], tasa_aprendizaje=0.5)
+datos_entrada = [[0,0], [0,1], [1,0], [1,1]]
+salidas_esperadas = [[0], [1], [1], [0]]
+red.entrenar(datos_entrada, salidas_esperadas, epocas=1000)
+imprimir("  🧠 Red Neuronal XOR:")
+para entrada in datos_entrada:
+    pred = red.predecir(entrada)[0]
+    imprimir(f"    {entrada} -> {pred:.2f}")
+
+# Clasificador IA
+clf = ClasificadorIA()
+datos_clasif = [[1.2, 3.4], [2.3, 4.5], [5.6, 7.8], [6.7, 8.9]]
+etiquetas = ["A", "A", "B", "B"]
+clf.entrenar(datos_clasif, etiquetas)
+nuevo = [2.0, 4.0]
+categoria, confianza = clf.clasificar(nuevo)
+imprimir(f"  🔍 Clasificación de {nuevo}: {categoria} ({confianza:.1%} confianza)")
+
+# K-Means
+kmeans = KMeans(k=2)
+datos_kmeans = [[1,2], [2,3], [8,7], [9,8]]
+grupos = kmeans.ajustar_predecir(datos_kmeans)
+imprimir(f"  🎯 K-Means grupos: {grupos}")
+
+# NLP: Análisis de sentimiento
+analizador = AnalizadorSentimiento()
+texto_pos = "Me encanta este producto, es maravilloso"
+resultado_pos = analizador.analizar(texto_pos)
+imprimir(f"  😊 Sentimiento positivo: {resultado_pos['sentimiento']} (score: {resultado_pos['puntuacion']})")
+
+# Tokenización
+tokens = tokenizar("Hola mundo desde Mi Lenguaje")
+imprimir(f"  ✂️ Tokens: {tokens}")
+
+# ------------------------------------------------------------------
+# 5. FUNCIONES AVANZADAS (FASE 8)
+# ------------------------------------------------------------------
+imprimir("\n📌 5. FUNCIONES AVANZADAS (FASE 8)")
+
+desde core.database importar ORM, QueryBuilder
+desde core.cache importar Caché, en_caché
+desde core.distributed importar Distribuidor
+desde core.plugins importar GestorPlugins, hook
+desde core.advanced_debug importar DepuradorAvanzado
+
+# ORM / Base de datos (simulado en memoria)
+orm = ORM(":memory:", tipo="sqlite")
+orm.conectar()
+orm.ejecutar_consulta("CREATE TABLE usuarios (id INTEGER, nombre TEXT)")
+qb = QueryBuilder(orm.db, "usuarios")
+qb.insertar({"id": 1, "nombre": "Ana"})
+qb.insertar({"id": 2, "nombre": "Luis"})
+resultados = qb.seleccionar("nombre").donde("id > ?", 0).obtener()
+imprimir(f"  🗄️  ORM consulta: {resultados}")
+
+# Sistema de Caché
+cache = Caché(capacidad=10, ttl=60)
+cache.establecer("clave1", "valor importante")
+valor = cache.obtener("clave1")
+imprimir(f"  💾 Caché: {valor}")
+
+# Decorador de caché (función decorada)
+@en_caché(ttl=30)
+función calcular_pesado(n):
+    # Simula operación costosa
+    retornar n * n
+
+imprimir(f"  ⚡ Decorador caché: calcular_pesado(5) = {calcular_pesado(5)}")
+
+# Computación distribuida (simulada)
+dist = Distribuidor(workers=2)
+dist.iniciar()
+tareas = [1,2,3,4]
+resultados_dist = dist.mapear(lambda x: x*2, tareas)
+imprimir(f"  🌐 Mapeo distribuido: {resultados_dist}")
+
+# MapReduce simple
+datos_mr = [1,2,3,4,5,6]
+suma_total = dist.mapear_reducir(
+    lambda x: x*2,
+    lambda acc, x: acc + x,
+    datos_mr,
+    inicial=0
+)
+imprimir(f"  📊 MapReduce (suma dobles): {suma_total}")
+
+# Plugins (registro de hooks)
+gestor_plugins = GestorPlugins("./plugins")
+
+@hook("inicio", prioridad=10)
+def mi_hook(datos):
+    imprimir(f"    Gancho ejecutado con datos: {datos}")
+
+gestor_plugins.registrar_hook("inicio", mi_hook)
+gestor_plugins.ejecutar_hook("inicio", "Hola desde el hook")
+
+# Depuración avanzada (punto de interrupción y punto de vigilancia)
+dep = DepuradorAvanzado()
+dep.agregar_breakpoint("todo_incluido.my", 120, condicion="x > 5")
+dep.agregar_watchpoint("variable_sensible")
+imprimir(f"  🐛 Breakpoints activos: {dep.listar_breakpoints()}")
+
+# ------------------------------------------------------------------
+# FIN DE LA DEMOSTRACIÓN
+# ------------------------------------------------------------------
+imprimir("\n✅ Demostración completada con éxito.")

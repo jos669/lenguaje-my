@@ -44,6 +44,7 @@ class TraductorMejorado:
         'excepto': 'except',
         'finalmente': 'finally',
         'importar': 'import',
+        'desde': 'from',  # Para imports
         'como': 'as',
         'verdadero': 'True',
         'falso': 'False',
@@ -114,15 +115,23 @@ class TraductorMejorado:
         """
         result = codigo
         
-        # 1. Arrow functions: fn(a,b) => expr
-        # fn suma(a,b) => a + b → def suma(a,b): return a + b
+        # 1. Arrow functions: fn nombre(a,b) => expr
+        # fn suma(a,b) => a + b → def suma(a,b):\n    return a + b
         result = re.sub(
             r'\bfn\s+(\w+)\s*\(([^)]*)\)\s*=>\s*([^\n]+)',
             lambda m: f'def {m.group(1)}({m.group(2)}):\n    return {m.group(3)}',
             result
         )
         
-        # Lambda shorthand: (a,b) => a + b
+        # Lambda shorthand: variable = fn(a,b) => expr
+        # suma = fn(a,b) => a + b → suma = lambda a,b: a + b
+        result = re.sub(
+            r'(\w+)\s*=\s*fn\s*\(([^)]*)\)\s*=>\s*([^\n]+)',
+            lambda m: f'{m.group(1)} = lambda {m.group(2)}: {m.group(3)}',
+            result
+        )
+        
+        # Lambda shorthand sin nombre: (a,b) => a + b
         result = re.sub(
             r'\(([^)]*)\)\s*=>\s*([^\n,]+)',
             lambda m: f'lambda {m.group(1)}: {m.group(2)}',
@@ -162,16 +171,28 @@ class TraductorMejorado:
         )
         
         # 6. Pattern matching básico
-        # match x: caso 1: ... caso _: ...
+        # match x: caso 1: ... predeterminado: ...
+        # match x: → match x:\n
         result = re.sub(
-            r'match\s+(\w+):\s*',
+            r'\bmatch\s+(\w+):\s*',
             lambda m: f'match {m.group(1)}:\n',
+            result
+        )
+        # caso X: → case X:
+        result = re.sub(
+            r'\bcaso\s+(.+?):',
+            lambda m: f'case {m.group(1)}:',
+            result
+        )
+        # predeterminado: → case _:
+        result = re.sub(
+            r'\bpredeterminado:',
+            'case _:',
             result
         )
         
         # 7. Try-catch inline: codigo ! fallback
         # resultado = risky() ! default → try: resultado = risky()\nexcept: resultado = default
-        # Solo para asignaciones simples (variable = valor)
         result = re.sub(
             r'(\w+\s*=\s*\w+\([^)!]*\))\s*!\s*([^\n]+)',
             lambda m: f'try:\n    {m.group(1)}\nexcept:\n    {m.group(1).split("=")[0].strip()} = {m.group(2)}',
@@ -327,11 +348,109 @@ class TraductorMejorado:
         return resultado
     
     def _validar_python(self, codigo: str):
-        """Valida que el código generado sea Python válido"""
+        """
+        Valida que el código generado sea Python válido
+        Muestra errores DETALLADOS con contexto exacto
+        """
         try:
             py_ast.parse(codigo)
         except SyntaxError as e:
-            raise TranslatorError(f"Código Python inválido: {e}")
+            # Construir mensaje de error detallado estilo Python
+            lineas = codigo.split('\n')
+            linea_error = e.lineno if e.lineno else 1
+            columna = getattr(e, 'offset', getattr(e, 'column', 0)) or 0
+            
+            # Obtener contexto (líneas alrededor del error)
+            inicio = max(0, linea_error - 3)
+            fin = min(len(lineas), linea_error + 3)
+            
+            # Construir mensaje detallado
+            mensaje_error = [
+                "",
+                "╔" + "═" * 70 + "╗",
+                "║  ❌ ERROR DE SINTAXIS EN CÓDIGO GENERADO".ljust(71) + "║",
+                "╠" + "═" * 70 + "╣",
+                f"║  Ubicación: línea {linea_error}, columna {columna}".ljust(71) + "║",
+                f"║  Tipo: {e.msg}".ljust(71) + "║",
+                "╟" + "─" * 70 + "╢",
+                "║  Código alrededor del error:".ljust(71) + "║",
+                "╟" + "─" * 70 + "╢",
+            ]
+            
+            # Agregar líneas de código con números
+            for i in range(inicio, fin):
+                num_linea = i + 1
+                linea = lineas[i] if i < len(lineas) else ""
+                
+                # Truncar línea si es muy larga
+                if len(linea) > 60:
+                    linea = linea[:57] + "..."
+                
+                # Marcar línea con error
+                if i + 1 == linea_error:
+                    mensaje_error.append(f"║ {num_linea:4} │ >> {linea}".ljust(71) + "║")
+                    # Agregar caret (^) apuntando al error
+                    if columna:
+                        caret_pos = max(0, min(columna - 1, len(linea)))
+                        mensaje_error.append(f"║      │    {' ' * caret_pos}^".ljust(71) + "║")
+                else:
+                    mensaje_error.append(f"║ {num_linea:4} │    {linea}".ljust(71) + "║")
+            
+            mensaje_error.extend([
+                "╟" + "─" * 70 + "╢",
+                "║  Sugerencias:".ljust(71) + "║",
+            ])
+            
+            # Agregar sugerencias basadas en el error
+            sugerencias = self._generar_sugerencias(e.msg, lineas[linea_error - 1] if linea_error <= len(lineas) else "")
+            for sug in sugerencias:
+                mensaje_error.append(f"║    • {sug}".ljust(71) + "║")
+            
+            mensaje_error.extend([
+                "╚" + "═" * 70 + "╝",
+                "",
+            ])
+            
+            raise TranslatorError("\n".join(mensaje_error))
+    
+    def _generar_sugerencias(self, error_msg: str, linea_codigo: str) -> List[str]:
+        """Genera sugerencias basadas en el tipo de error"""
+        sugerencias = []
+        error_msg_lower = error_msg.lower()
+        
+        if "invalid syntax" in error_msg_lower:
+            sugerencias.append("Verifica que todos los paréntesis, corchetes y llaves estén cerrados")
+            sugerencias.append("Revisa que las comillas estén balanceadas")
+        
+        if "unexpected indent" in error_msg_lower:
+            sugerencias.append("La indentación es inconsistente - usa 4 espacios")
+            sugerencias.append("No mezcles tabs y espacios")
+        
+        if "expected an indented block" in error_msg_lower:
+            sugerencias.append("Después de ':', la siguiente línea debe estar indentada")
+            sugerencias.append("Verifica después de def, if, for, while, class, etc.")
+        
+        if "eol while scanning" in error_msg_lower:
+            sugerencias.append("Hay una cadena sin cerrar (comillas incompletas)")
+        
+        if "keyword" in error_msg_lower or "reserved" in error_msg_lower:
+            sugerencias.append("Estás usando una palabra reservada de Python como variable")
+        
+        if "name" in error_msg_lower and "not defined" in error_msg_lower:
+            sugerencias.append("La variable no está definida - verifica el nombre o el scope")
+        
+        # Sugerencias específicas basadas en el código
+        if 'fn' in linea_codigo and '=>' not in linea_codigo:
+            sugerencias.append("Arrow function incompleta - usa: fn(args) => expresion")
+        
+        if '..' in linea_codigo and 'range' not in linea_codigo:
+            sugerencias.append("Range shorthand debe estar en un contexto válido (ej: for x en 1..10)")
+        
+        if not sugerencias:
+            sugerencias.append("Revisa la sintaxis del código My Lenguaje")
+            sugerencias.append("Ejecuta 'python my.py keywords' para ver keywords válidas")
+        
+        return sugerencias[:4]  # Máximo 4 sugerencias
     
     def traducir_archivo(self, input_path: str, output_path: str = None) -> str:
         """Traduce un archivo .my"""

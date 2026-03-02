@@ -1,13 +1,115 @@
-# Mi primer programa en My Lenguaje
+# ============================================================
+#  DEMO COMPLETA MY LENGUAJE v0.9.0
+#  Incluye: Sintaxis básica + Features Concisas (Fase 9)
+# ============================================================
 
-función principal():
-    imprimir("¡Hola desde My Lenguaje!")
-    
-    definir nombre: cadena = "Mundo"
-    imprimir(f"Hola, {nombre}!")
-    
-    # Ejemplo con bucle
-    para i en rango(5):
-        imprimir(f"Contando: {i}")
+imprimir("🚀 Demo My Lenguaje v0.9.0")
+imprimir("=" * 50)
 
-principal()
+# ------------------------------------------------------------------
+# 1. SINTAXIS BÁSICA
+# ------------------------------------------------------------------
+imprimir("\n📌 1. SINTAXIS BÁSICA")
+
+definir nombre = "Mundo"
+definir edad: entero = 25
+
+imprimir(f"Hola {nombre}! Edad: {edad}")
+
+# Función tradicional
+función saludar(n):
+    retornar "Hola, " + n
+
+imprimir(saludar("Estudiante"))
+
+# Condicional
+si edad >= 18:
+    imprimir("Mayor de edad")
+sino:
+    imprimir("Menor de edad")
+
+# Bucle
+para i en rango(5):
+    imprimir(f"  Iteración {i}")
+
+# ------------------------------------------------------------------
+# 2. FASE 9 - SINTAXIS CONCISA
+# ------------------------------------------------------------------
+imprimir("\n📌 2. SINTAXIS CONCISA (FASE 9)")
+
+# Arrow function
+suma = fn(a,b) => a + b
+imprimir(f"  Arrow suma(5,3) = {suma(5,3)}")
+
+# Range shorthand
+imprimir("  Range 1..5: ", end="")
+para i en 1..5:
+    imprimir(i, end=" ")
+imprimir()
+
+# Ternario inline
+edad_prueba = 20
+estado = ?edad_prueba >= 18: "mayor" sino: "menor"
+imprimir(f"  Ternario: {estado}")
+
+# List comprehension corta
+numeros = [1,2,3,4,5]
+dobles = [x*2 p x en numeros]
+imprimir(f"  Lista corta: {dobles}")
+
+# SQL-like query
+mayores = selecciona x de numeros donde x > 3
+imprimir(f"  SQL-like: {mayores}")
+
+# ------------------------------------------------------------------
+# 3. IA/ML (FASE 7)
+# ------------------------------------------------------------------
+imprimir("\n📌 3. IA/ML (FASE 7)")
+
+desde core.ai importar RedNeuronal
+desde core.nlp importar AnalizadorSentimiento, tokenizar
+
+# Red Neuronal XOR
+red = RedNeuronal([2, 4, 1], tasa_aprendizaje=0.5)
+datos = [[0,0], [0,1], [1,0], [1,1]]
+salidas = [[0], [1], [1], [0]]
+red.entrenar(datos, salidas, epocas=500)
+
+imprimir("  Red XOR:")
+para dato in datos:
+    pred = red.predecir(dato)[0]
+    imprimir(f"    {dato} -> {pred:.2f}")
+
+# NLP
+analizador = AnalizadorSentimiento()
+texto = "Me encanta, es maravilloso"
+resultado = analizador.analizar(texto)
+imprimir(f"  Sentimiento: {resultado['sentimiento']} (score: {resultado['puntuacion']:.2f})")
+
+tokens = tokenizar("Hola mundo desde My Lenguaje")
+imprimir(f"  Tokens: {tokens}")
+
+# ------------------------------------------------------------------
+# 4. ADVANCED (FASE 8)
+# ------------------------------------------------------------------
+imprimir("\n📌 4. ADVANCED (FASE 8)")
+
+desde core.cache importar Caché
+desde core.database importar ORM, QueryBuilder
+
+# Caché
+cache = Caché(capacidad=10, ttl=60)
+cache.establecer("clave", "valor")
+imprimir(f"  Caché: {cache.obtener('clave')}")
+
+# ORM
+orm = ORM(":memory:", tipo="sqlite")
+orm.conectar()
+orm.ejecutar_consulta("CREATE TABLE t (id INTEGER, nombre TEXT)")
+qb = QueryBuilder(orm.db, "t")
+qb.insertar({"id": 1, "nombre": "Ana"})
+resultados = qb.seleccionar("nombre").obtener()
+imprimir(f"  ORM: {resultados}")
+
+# ------------------------------------------------------------------
+imprimir("\n✅ Demo completada!")
