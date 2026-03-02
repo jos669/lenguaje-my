@@ -1,0 +1,89 @@
+# My Lenguaje - Ejemplo Fase 4
+# Características avanzadas y optimizaciones
+
+# === Decoradores ===
+función decorador_log(func):
+    función wrapper(*args, **kwargs):
+        imprimir(f"[LOG] Llamando a función")
+        resultado = func(*args, **kwargs)
+        imprimir(f"[LOG] Resultado: {resultado}")
+        retornar resultado
+    retornar wrapper
+
+
+# === Función con decorador ===
+@decorador_log
+función suma(a, b):
+    retornar a + b
+
+
+# === Context Manager ===
+clase Contexto:
+    función __enter__(self):
+        imprimir("Entrando al contexto")
+        retornar self
+    
+    función __exit__(self, exc_type, exc_val, exc_tb):
+        imprimir("Saliendo del contexto")
+
+
+# === Async/Await ===
+asíncrono función obtener_datos():
+    imprimir("Obteniendo datos...")
+    esperar entrada()  # Simulamos espera
+    retornar "datos"
+
+
+# === Tipos opcionales ===
+definir nombre: cadena = "Mundo"
+definir edad: entero = 25
+definir altura: flotante = 1.75
+definir activo: booleano = verdadero
+
+
+# === Expresiones para optimización ===
+definir x = 2 + 3 * 4  # Se optimiza a 14
+definir y = 100 / 10   # Se optimiza a 10
+definir z = 5 ** 2     # Se optimiza a 25
+
+
+# === Strings ===
+definir saludo = "Hola" + " " + "Mundo"  # Se concatena
+
+
+# === Booleanos para optimización ===
+si verdadero y x > 10:
+    imprimir("Mayor que 10")
+
+si falso o y == 10:
+    imprimir("Y es 10")
+
+
+# === Uso de context manager ===
+con Contexto() como ctx:
+    imprimir("Dentro del contexto")
+
+
+# === List Comprehension ===
+definir cuadrados = [n * n para n en rango(10)]
+imprimir("Cuadrados:", cuadrados)
+
+
+# === Función principal ===
+función principal():
+    imprimir("=== FASE 4 ===")
+    imprimir(f"Nombre: {nombre}")
+    imprimir(f"Edad: {edad}")
+    imprimir(f"Altura: {altura}")
+    
+    resultado = suma(5, 3)
+    imprimir(f"Suma: {resultado}")
+    
+    imprimir(f"X (optimizado): {x}")
+    imprimir(f"Y (optimizado): {y}")
+    imprimir(f"Z (optimizado): {z}")
+    
+    imprimir(f"Saludo: {saludo}")
+
+
+principal()

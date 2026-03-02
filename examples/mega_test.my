@@ -1,0 +1,141 @@
+# My Lenguaje - Mega Test Fase 6
+# Archivo completo para probar TODAS las características
+
+importar math como m
+
+# Decorador
+función decorador_log(func):
+    función envoltura(*args, **kwargs):
+        imprimir(f"[LOG] {func.__name__}")
+        resultado = func(*args, **kwargs)
+        imprimir(f"[LOG] Resultado: {resultado}")
+        retornar resultado
+    retornar envoltura
+
+# Clases
+clase Animal:
+    función __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+    
+    función describir(self):
+        retornar f"{self.nombre} tiene {self.edad} años"
+
+clase Perro(Animal):
+    función hablar(self):
+        retornar "¡Guau!"
+
+# Funciones con tipos
+función calcular_area(radio: flotante) -> flotante:
+    """Calcula área de círculo"""
+    retornar m.pi * radio ** 2
+
+función factorial(n: entero) -> entero:
+    si n <= 1:
+        retornar 1
+    retornar n * factorial(n - 1)
+
+función evaluar(x: entero) -> cadena:
+    si x > 10:
+        retornar "mayor"
+    sino si x < 0:
+        retornar "negativo"
+    sino:
+        retornar "normal"
+
+función probar_bucles() -> lista:
+    resultados = []
+    para i en rango(5):
+        resultados.append(i * 2)
+    
+    cuadrados = [n * n para n en rango(10)]
+    resultados.append(longitud(cuadrados))
+    retornar resultados
+
+función dividir(a, b):
+    intentar:
+        retornar a / b
+    excepto:
+        imprimir("Error en división")
+        retornar 0.0
+    finalmente:
+        imprimir("División completada")
+
+clase Recurso:
+    función __enter__(self):
+        imprimir("Abriendo...")
+        retornar self
+    función __exit__(self, *args):
+        imprimir("Cerrando...")
+    función usar(self):
+        retornar "usado"
+
+función suma_multiple(*args, **kwargs):
+    total = 0
+    para n en args:
+        total  =  n
+    si "mult" en kwargs:
+        total  =  kwargs["mult"]
+    retornar total
+
+@decorador_log
+función principal():
+    imprimir("=" * 50)
+    imprimir("MY LENGUAJE FASE 6 - MEGA TEST")
+    imprimir("=" * 50)
+    
+    # 1. Variables
+    imprimir("\n1. VARIABLES")
+    definir nombre: cadena = "Test"
+    definir edad: entero = 25
+    imprimir(f"Nombre: {nombre}, Edad: {edad}")
+    
+    # 2. Clases
+    imprimir("\n2. CLASES")
+    perro = Perro("Firulais", 5)
+    imprimir(perro.describir())
+    imprimir(perro.hablar())
+    
+    # 3. Matemáticas
+    imprimir("\n3. MATEMÁTICAS")
+    imprimir(f"Área (r=5): {calcular_area(5):.2f}")
+    imprimir(f"Factorial(5): {factorial(5)}")
+    
+    # 4. Condicionales
+    imprimir("\n4. CONDICIONALES")
+    imprimir(f"x=15: {evaluar(15)}")
+    imprimir(f"x=-5: {evaluar(-5)}")
+    imprimir(f"x=5: {evaluar(5)}")
+    
+    # 5. Bucles
+    imprimir("\n5. BUCLES")
+    imprimir(f"Resultados: {probar_bucles()}")
+    
+    # 6. Errores
+    imprimir("\n6. ERRORES")
+    imprimir(f"10/2 = {dividir(10, 2)}")
+    imprimir(f"10/0 = {dividir(10, 0)}")
+    
+    # 7. Context
+    imprimir("\n7. CONTEXT MANAGERS")
+    con Recurso() como r:
+        imprimir(r.usar())
+    
+    # 8. Args variables
+    imprimir("\n8. ARGS VARIABLES")
+    imprimir(f"Suma(1,2,3) = {suma_multiple(1, 2, 3)}")
+    imprimir(f"Suma(1,2,3, mult=2) = {suma_multiple(1, 2, 3, mult=2)}")
+    
+    # 9. Optimizaciones
+    imprimir("\n9. OPTIMIZACIONES")
+    definir x = 2 + 3 * 4
+    definir y = 100 / 10
+    imprimir(f"x = 2+3*4 = {x}")
+    imprimir(f"y = 100/10 = {y}")
+    
+    imprimir("\n" + "=" * 50)
+    imprimir("¡TEST COMPLETADO!")
+    imprimir("=" * 50)
+
+si __name__ == "__main__":
+    principal()

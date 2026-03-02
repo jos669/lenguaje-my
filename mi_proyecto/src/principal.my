@@ -1,0 +1,21 @@
+# My Lenguaje - Proyecto Nuevo
+# Archivo: principal.my
+
+función principal():
+    imprimir("¡Hola desde My Lenguaje!")
+    
+    definir nombre: cadena = "Mundo"
+    imprimir("Hola, " + nombre)
+    
+    # Ejemplo con tipos
+    definir edad: entero = 25
+    definir altura: flotante = 1.75
+    
+    si edad >= 18:
+        imprimir("Eres mayor de edad")
+    
+    # Lista
+    definir numeros: lista = [1, 2, 3, 4, 5]
+    imprimir("Cantidad:", longitud(numeros))
+
+principal()

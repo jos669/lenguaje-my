@@ -1,0 +1,18 @@
+# My Lenguaje - Requisitos
+
+# Core - Requerido
+lark>=1.1.5
+
+# Desarrollo y Tests
+pytest>=7.0.0
+pytest-cov>=4.0.0
+
+# Utilidades
+click>=8.0.0
+
+# Opcionales (para características avanzadas)
+# cProfile - incluido en Python estándar
+# curses - incluido en Linux/Mac
+
+# Para Windows (curses no está disponible)
+# windows-curses; sys_platform == 'win32'

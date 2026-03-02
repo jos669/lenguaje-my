@@ -1,0 +1,9 @@
+# My Lenguaje - Proyecto Nuevo
+
+función principal():
+    imprimir("¡Hola desde My Lenguaje v0.6.0!")
+    
+    definir nombre: cadena = "Mundo"
+    imprimir("Hola, " + nombre)
+
+principal()

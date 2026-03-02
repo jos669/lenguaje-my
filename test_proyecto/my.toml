@@ -1,0 +1,10 @@
+[proyecto]
+nombre = "test_proyecto"
+version = "0.1.0"
+autor = ""
+descripcion = ""
+licencia = "MIT"
+
+[dependencias]
+
+[dependencias_desarrollo]

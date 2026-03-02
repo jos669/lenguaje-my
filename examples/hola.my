@@ -1,0 +1,62 @@
+# Ejemplo básico en My Lenguaje
+# Guarda este archivo como hola.my
+
+# Variables
+definir saludo = "Hola Mundo"
+definir contador = 0
+
+# Función básica
+función saludar(nombre):
+    retornar "Hola, " + nombre
+
+# Imprimir saludo
+imprimir(saludo)
+imprimir(saludar("Mundo"))
+
+# Condicional
+si contador == 0:
+    imprimir("Contador en cero")
+sino:
+    imprimir("Contador mayor a cero")
+
+# Bucle para
+para i en rango(5):
+    imprimir("Iteración: " + str(i))
+
+# Bucle mientras
+mientras contador < 3:
+    imprimir("Contando: " + str(contador))
+    contador = contador + 1
+
+# Clase
+clase Persona:
+    función __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+    
+    función presentarse(self):
+        retornar "Soy " + self.nombre + " y tengo " + str(self.edad) + " años"
+
+# Usar la clase
+persona1 = Persona("Ana", 25)
+imprimir(persona1.presentarse())
+
+# Lista
+definir numeros = [1, 2, 3, 4, 5]
+imprimir("Lista: " + str(numeros))
+imprimir("Longitud: " + str(longitud(numeros)))
+
+# Operadores lógicos
+definir x = 10
+si x > 5 y x < 15:
+    imprimir("x está en el rango correcto")
+
+# Manejo de errores
+intentar:
+    resultado = 10 / 0
+excepto:
+    imprimir("¡Error detectado!")
+finalmente:
+    imprimir("Bloque finalmente ejecutado")
+
+imprimir("¡Programa terminado!")

@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# My Lenguaje
+*.pyc
+*.pyo
+*.pyd
+test_temp.*
+*.orig
+.pytest_cache/
+
+# Archivos compilados
+*.pyc
+__pycache__/
+
+# Logs
+*.log
+
+# Ambiente de desarrollo
+.my/
+.my_packages/
+
+# Documentación generada
+docs/_build/
+docs/*.md
+
+# Archivos de prueba
+test_*.py
+*_test.py
+!tests/
+
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
+coverage.xml
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter
+.ipynb_checkpoints
