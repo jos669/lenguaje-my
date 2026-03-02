@@ -10,6 +10,15 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# Intentar usar tomllib (Python 3.11+) o toml library
+try:
+    import tomllib
+except ImportError:
+    try:
+        import toml as tomllib
+    except ImportError:
+        tomllib = None
+
 
 class GestorPaquetes:
     """
@@ -152,10 +161,31 @@ class GestorPaquetes:
             print("No se pudo obtener la lista de paquetes")
     
     def _leer_toml(self) -> dict:
-        """Lee el archivo my.toml"""
+        """Lee el archivo my.toml usando biblioteca TOML real"""
         if not self.archivo_config.exists():
             return {'proyecto': {}, 'dependencias': {}}
         
+        # Usar biblioteca TOML si está disponible
+        if tomllib:
+            try:
+                with open(self.archivo_config, 'rb' if hasattr(tomllib, 'load') else 'r') as f:
+                    if hasattr(tomllib, 'load'):
+                        # tomllib (Python 3.11+) usa modo binario
+                        return tomllib.load(f)
+                    else:
+                        # toml library usa modo texto
+                        return tomllib.load(f)
+            except Exception as e:
+                import logging
+                logging.error(f"Error leyendo TOML: {e}")
+                # Fallback al parser manual
+                return self._leer_toml_manual()
+        else:
+            # Fallback al parser manual si no hay biblioteca
+            return self._leer_toml_manual()
+    
+    def _leer_toml_manual(self) -> dict:
+        """Parser TOML manual (fallback)"""
         config = {'proyecto': {}, 'dependencias': {}, 'dependencias_desarrollo': {}}
         seccion_actual = None
         
@@ -173,7 +203,8 @@ class GestorPaquetes:
                 
                 if '=' in linea and seccion_actual:
                     clave, valor = linea.split('=', 1)
-                    config[seccion_actual][clave.strip()] = valor.strip().strip('"\'')
+                    valor = valor.strip().strip('"\'')
+                    config[seccion_actual][clave.strip()] = valor
         
         return config
     

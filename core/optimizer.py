@@ -61,11 +61,12 @@ class Optimizador:
             (r'(\d+)\s*-\s*(\d+)', lambda m: str(int(m.group(1)) - int(m.group(2)))),
             # Multiplicación de enteros
             (r'(\d+)\s*\*\s*(\d+)', lambda m: str(int(m.group(1)) * int(m.group(2)))),
-            # División de enteros (solo si es exacta y divisor no es cero)
-            (r'(\d+)\s*/\s*(\d+)', lambda m: str(int(m.group(1)) // int(m.group(2))) if int(m.group(2)) != 0 and int(m.group(1)) % int(m.group(2)) == 0 else m.group(0)),
+            # División - VERIFICA si son floats o enteros
+            (r'(\d+\.\d+|\d+)\s*/\s*(\d+\.\d+|\d+)', 
+             lambda m: self._optimizar_division(m.group(1), m.group(2))),
             # Potencia
             (r'(\d+)\s*\*\*\s*(\d+)', lambda m: str(int(m.group(1)) ** int(m.group(2)))),
-            # Módulo
+            # Módulo (solo enteros)
             (r'(\d+)\s*%\s*(\d+)', lambda m: str(int(m.group(1)) % int(m.group(2)))),
         ]
         
@@ -75,8 +76,33 @@ class Optimizador:
         
         if resultado != codigo:
             self.optimizaciones_aplicadas.append('constant_folding')
-        
+
         return resultado
+    
+    def _optimizar_division(self, num_str: str, den_str: str) -> str:
+        """Optimiza división manejando floats y enteros correctamente"""
+        try:
+            # Verificar si son floats
+            num = float(num_str)
+            den = float(den_str)
+            
+            if den == 0:
+                return f"{num_str} / {den_str}"  # No optimizar división por cero
+            
+            # Si ambos son enteros y la división es exacta
+            if num.is_integer() and den.is_integer() and num % den == 0:
+                return str(int(num // den))
+            
+            # Si son floats o división no exacta
+            result = num / den
+            # Redondear a 6 decimales si es float
+            if result.is_integer():
+                return str(int(result))
+            else:
+                return f"{result:.6f}".rstrip('0').rstrip('.')
+                
+        except:
+            return f"{num_str} / {den_str}"  # No optimizar si hay error
     
     def _optimizar_booleanos(self, codigo: str) -> str:
         """

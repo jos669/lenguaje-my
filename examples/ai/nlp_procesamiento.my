@@ -1,0 +1,147 @@
+# Ejemplo de NLP en My Lenguaje - Fase 7
+# Procesamiento de Lenguaje Natural en español
+
+desde core importar (
+    tokenizar, analizar_sentimiento, crear_chatbot,
+    extraer_palabras_clave, stemmear
+)
+
+
+función tokenizacion_demo():
+    """Demo de tokenización"""
+    imprimir("\n📝 Tokenización")
+    imprimir("-" * 50)
+    
+    texto = "El rápido zorro marrón salta sobre el perro perezoso. ¡Qué increíble!"
+    
+    imprimir(f"Texto original: {texto}")
+    
+    tokens = tokenizar(texto)
+    imprimir(f"\nTokens encontrados: {longitud(tokens)}")
+    imprimir(f"Tokens: {tokens}")
+
+
+función sentimiento_demo():
+    """Demo de análisis de sentimiento"""
+    imprimir("\n💕 Análisis de Sentimiento")
+    imprimir("-" * 50)
+    
+    textos = [
+        "Me encanta este producto, es absolutamente maravilloso y excelente",
+        "Esto es terrible, muy malo y pésimo, estoy muy decepcionado",
+        "El clima está regular, ni bueno ni malo, es normal",
+        "¡Qué día tan hermoso! Estoy feliz y contento con la vida",
+        "Estoy triste y enojado, todo me sale mal y horrible"
+    ]
+    
+    analizador = analizar_sentimiento
+    
+    para texto en textos:
+        resultado = analizador(texto)
+        sentimiento = resultado["sentimiento"]
+        puntuacion = resultado["puntuacion"]
+        
+        # Emoji según sentimiento
+        emoji = "😊" si sentimiento == "positivo" else ("😢" si sentimiento == "negativo" else "😐")
+        
+        imprimir(f"\n{emoji} \"{texto[:50]}...\"")
+        imprimir(f"   Sentimiento: {sentimiento} ({puntuacion:.3f})")
+        
+        si resultado["positivas"] > 0:
+            imprimir(f"   Positivas: {resultado['positivas']}")
+        si resultado["negativas"] > 0:
+            imprimir(f"   Negativas: {resultado['negativas']}")
+
+
+función stemming_demo():
+    """Demo de stemming"""
+    imprimir("\n🌱 Stemming (Reducción de palabras)")
+    imprimir("-" * 50)
+    
+    palabras = [
+        "corriendo", "corredor", "corrimiento",
+        "amando", "amante", "amor",
+        "estudiando", "estudiante", "estudio",
+        "programación", "programador", "programar",
+        "feliz", "felicidad", "felicitaciones"
+    ]
+    
+    imprimir("Palabras originales → Raíz")
+    imprimir("-" * 40)
+    
+    para palabra en palabras:
+        # Usar stemmer directamente
+        desde core.ml importar Stemmer
+        stemmer = Stemmer()
+        raiz = stemmer.stem(palabra)
+        imprimir(f"  {palabra:<20} → {raiz}")
+
+
+función keywords_demo():
+    """Demo de extracción de palabras clave"""
+    imprimir("\n🔑 Extracción de Palabras Clave")
+    imprimir("-" * 50)
+    
+    texto = """
+    La inteligencia artificial y el machine learning son tecnologías 
+    revolucionarias que están transformando el mundo. Las redes neuronales 
+    artificiales permiten crear modelos de aprendizaje automático muy 
+    potentes. El procesamiento de lenguaje natural es una rama de la IA 
+    que permite a las computadoras entender el lenguaje humano.
+    """
+    
+    imprimir(f"Texto: {texto.strip()[:100]}...")
+    
+    # Extraer palabras clave
+    keywords = extraer_palabras_clave(texto)
+    
+    imprimir("\nPalabras clave extraídas:")
+    para keyword, score en keywords:
+        imprimir(f"  {keyword:<20} (score: {score:.4f})")
+
+
+función chatbot_demo():
+    """Demo de chatbot"""
+    imprimir("\n🤖 Chatbot Interactivo")
+    imprimir("-" * 50)
+    imprimir("Ejemplos de conversación:")
+    imprimir()
+    
+    chatbot = crear_chatbot()
+    
+    # Simular conversación
+    entradas = [
+        "Hola, ¿cómo estás?",
+        "¿Cuál es tu nombre?",
+        "¿Qué puedes hacer?",
+        "Cuéntame un chiste",
+        "Me siento muy feliz hoy",
+        "Estoy triste y enojado",
+        "Gracias por tu ayuda",
+        "Adiós"
+    ]
+    
+    para entrada en entradas:
+        respuesta = chatbot.responder(entrada)
+        imprimir(f"  Tú: {entrada}")
+        imprimir(f"  Chatbot: {respuesta}")
+        imprimir()
+
+
+función principal():
+    imprimir("🗣️  NLP - Procesamiento de Lenguaje Natural")
+    imprimir("=" * 50)
+    imprimir("Fase 7 - My Lenguaje")
+    
+    tokenizacion_demo()
+    sentimiento_demo()
+    stemming_demo()
+    keywords_demo()
+    chatbot_demo()
+    
+    imprimir("\n" + "=" * 50)
+    imprimir("✅ Demo de NLP completada exitosamente")
+    imprimir("\n💡 Tip: Usa 'python my.py chat' para chatear interactivamente")
+
+
+principal()

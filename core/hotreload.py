@@ -35,23 +35,45 @@ class HotReloader:
             return ""
     
     def _escanear_archivos(self) -> Set[Path]:
-        """Escanea todos los archivos .my relacionados"""
+        """Escanea todos los archivos .my relacionados - CON imports relativos resueltos"""
         archivos = {self.archivo_principal}
-        
+        directorio_base = self.archivo_principal.parent
+
         # Buscar imports
         try:
             with open(self.archivo_principal, 'r', encoding='utf-8') as f:
                 for linea in f:
-                    if linea.strip().startswith('importar'):
-                        partes = linea.strip().split()
+                    linea = linea.strip()
+                    if linea.startswith('importar'):
+                        partes = linea.split()
                         if len(partes) >= 2:
-                            modulo = partes[1].replace('.', '/')
-                            archivo_mod = Path(modulo + '.my')
+                            modulo = partes[1]
+                            
+                            # Resolver imports relativos (con puntos)
+                            if modulo.startswith('.'):
+                                # Import relativo
+                                niveles = modulo.count('.')
+                                modulo = modulo.lstrip('.')
+                                # Navegar hacia arriba en el árbol de directorios
+                                base = directorio_base
+                                for _ in range(niveles - 1):
+                                    base = base.parent
+                                archivo_mod = base / (modulo.replace('.', '/') + '.my')
+                            else:
+                                # Import absoluto
+                                archivo_mod = directorio_base / (modulo.replace('.', '/') + '.my')
+                            
                             if archivo_mod.exists():
                                 archivos.add(archivo_mod)
-        except:
-            pass
-        
+                            else:
+                                # Intentar en directorio actual
+                                archivo_mod = Path(modulo.replace('.', '/') + '.my')
+                                if archivo_mod.exists():
+                                    archivos.add(archivo_mod)
+        except Exception as e:
+            import logging
+            logging.error(f"Error escaneando archivos: {e}")
+
         return archivos
     
     def _iniciar_monitoreo(self):

@@ -149,7 +149,9 @@ try_except: INTENTAR COLON NEWLINE INDENT statement+ DEDENT except_block+ (final
 except_block: EXCEPTO IDENTIFIER? COLON NEWLINE INDENT statement+ DEDENT
 finally_block: FINALMENTE COLON NEWLINE INDENT statement+ DEDENT
 
-// Importación
+// Importación (Fase 3)
+// NEWLINE ya está incluido en la regla statement
+importacion: IMPORTAR modulo (COMO IDENTIFIER)?
 modulo: IDENTIFIER (DOT IDENTIFIER)*
 
 // Retorno

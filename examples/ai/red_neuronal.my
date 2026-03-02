@@ -1,0 +1,48 @@
+# Ejemplo de Red Neuronal en My Lenguaje - Fase 7
+# Problema: XOR (o exclusivo)
+
+# Importar módulo de IA
+desde core importar red_neuronal, entrenar, predecir
+
+función principal():
+    imprimir("🧠 Red Neuronal - Problema XOR")
+    imprimir("=" * 50)
+    
+    # Crear red neuronal: 2 entradas, 4 neuronas ocultas, 1 salida
+    red = red_neuronal(arquitectura=[2, 4, 1], tasa_aprendizaje=0.1)
+    
+    # Datos de entrenamiento para XOR
+    datos_entrada = [
+        [0, 0],  # 0 XOR 0 = 0
+        [0, 1],  # 0 XOR 1 = 1
+        [1, 0],  # 1 XOR 0 = 1
+        [1, 1]   # 1 XOR 1 = 0
+    ]
+    
+    datos_salida = [
+        [0],
+        [1],
+        [1],
+        [0]
+    ]
+    
+    imprimir("Entrenando red neuronal (1000 épocas)...")
+    errores = entrenar(red, datos_entrada, datos_salida, epocas=1000)
+    
+    imprimir("\n✅ Entrenamiento completado")
+    imprimir("\nResultados:")
+    imprimir("-" * 50)
+    
+    # Probar la red
+    para i en rango(longitud(datos_entrada)):
+        entrada = datos_entrada[i]
+        esperado = datos_salida[i][0]
+        prediccion = predecir(red, entrada)[0]
+        
+        imprimir(f"  {entrada[0]} XOR {entrada[1]} = {prediccion:.4f} (esperado: {esperado})")
+    
+    imprimir("\n" + "=" * 50)
+    imprimir("¡Red neuronal entrenada exitosamente!")
+
+
+principal()

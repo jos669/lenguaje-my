@@ -56,12 +56,20 @@ class Logger:
         self.handlers.append(('archivo', archivo))
     
     def _formatear(self, nivel: str, mensaje: str) -> str:
+        """Formatea el mensaje de log de manera segura"""
+        from string import Template
+        
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        formato_str = self.formato
-        formato_str = formato_str.replace('%(fecha)s', fecha)
-        formato_str = formato_str.replace('%(nombre)s', self.nombre)
-        formato_str = formato_str.replace('%(nivel)s', nivel)
-        formato_str = formato_str.replace('%(mensaje)s', mensaje)
+        
+        # Usar Template para evitar reemplazo accidental de %(x)s en el mensaje
+        template = Template(self.formato)
+        formato_str = template.substitute(
+            fecha=fecha,
+            nombre=self.nombre,
+            nivel=nivel,
+            mensaje=mensaje
+        )
+        
         return formato_str
     
     def _escribir(self, nivel: str, mensaje: str):

@@ -105,18 +105,27 @@ class GeneradorDocumentacion:
         return resultado
     
     def _extraer_funciones(self, texto: str, archivo: str):
-        """Extrae funciones del código"""
+        """Extrae funciones del código - CON posición correcta de docstring"""
         patron = r'función\s+(\w+)\s*\(([^)]*)\)\s*(?:->\s*(\w+))?:'
-        
+
         for match in re.finditer(patron, texto):
             nombre = match.group(1)
             params = match.group(2)
             tipo_retorno = match.group(3) or ""
+
+            # Buscar docstring DESPUÉS de ':' y NEWLINE, no desde match.end()
+            # Encontrar la posición después de ':' y el primer NEWLINE
+            colon_pos = match.end()
+            newline_pos = texto.find('\n', colon_pos)
             
-            # Buscar docstring
-            docstring, _ = self._extraer_docstring(texto, match.end())
+            if newline_pos != -1:
+                # Buscar docstring desde después del newline
+                docstring, _ = self._extraer_docstring(texto, newline_pos + 1)
+            else:
+                docstring = ""
+            
             info = self._parsear_docstring(docstring)
-            
+
             item = DocItem(
                 nombre=nombre,
                 tipo='funcion',

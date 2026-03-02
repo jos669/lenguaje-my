@@ -1,18 +1,21 @@
 """
-My Lenguaje - Traductor Mejorado (Fase 1.5)
-Traductor que protege strings/comentarios y evita bugs de Fase 1
+My Lenguaje - Traductor Mejorado (Fase 2.0 - Corregido)
+Traductor que protege strings/comentarios y evita bugs
 
-Mejoras:
+Mejoras implementadas:
 - Sin colisiones de placeholders (usa UUID único)
 - No traduce keywords dentro de strings/comentarios
-- Manejo correcto de 'y', 'o', 'no' como variables
+- Manejo ROBUSTO de 'y', 'o', 'no' como variables
+- Soporte para escapes en strings (\", \', \\, \n, etc.)
 - Validación del código Python generado
+- Mapeo de líneas para errores precisos
+- Keywords adicionales: parar, continuar, pasar
 """
 
 import re
 import uuid
 import ast as py_ast
-from typing import Dict
+from typing import Dict, List, Tuple
 
 
 class TranslatorError(Exception):
@@ -24,7 +27,7 @@ class TraductorMejorado:
     """
     Traductor mejorado que protege strings y comentarios
     """
-    
+
     # Keywords que se traducen (mapeo español → python)
     KEYWORD_MAP = {
         'sino si': 'elif',
@@ -57,72 +60,181 @@ class TraductorMejorado:
         'asíncrono': 'async',
         'esperar': 'await',
         'con': 'with',
+        # Control de flujo adicional
+        'parar': 'break',
+        'continuar': 'continue',
+        'pasar': 'pass',
+        # Concise syntax (Fase 9)
+        'fn': 'lambda',
+        'paralelo': 'async',  # Para concurrencia nativa
+        'selecciona': 'filter',  # SQL-like queries
+        'donde': 'if',  # Para queries
+        'match': 'match',  # Pattern matching (Python 3.10+)
+        'caso': 'case',
+        'predeterminado': 'case _',
     }
     
     def __init__(self):
         self.placeholders: Dict[str, str] = {}
     
     def traducir(self, codigo: str) -> str:
-        """Traduce código My a Python"""
+        """Traduce código My a Python con features concisas"""
         self.placeholders = {}
-        
+
+        # Fase 0: Features concisas (ANTES de proteger strings)
+        codigo = self._traducir_features_concisos(codigo)
+
         # Fase 1: Proteger strings y comentarios con UUIDs únicos
         codigo_protegido = self._proteger(codigo)
-        
+
         # Fase 2: Aplicar traducciones
         codigo_traducido = self._traducir_keywords(codigo_protegido)
-        
+
         # Fase 2.5: Traducir tipos a Python
         codigo_traducido = self._traducir_tipos(codigo_traducido)
-        
+
         # Fase 3: Restaurar strings y comentarios
         codigo_final = self._restaurar(codigo_traducido)
-        
+
         # Fase 4: Validar Python generado
         self._validar_python(codigo_final)
-        
+
         return codigo_final
     
-    def _proteger(self, codigo: str) -> str:
-        """Protege strings y comentarios reemplazándolos con placeholders"""
+    def _traducir_features_concisos(self, codigo: str) -> str:
+        """
+        Traduce features concisas de Espy a Python
+        
+        Features implementadas:
+        - Arrow functions: fn(a,b) => expr
+        - Range shorthand: 1..10 → range(1, 11)
+        - Inline ternary: ?cond: a sino: b
+        - List comprehensions cortas: [x p x en lista]
+        - Pattern matching básico
+        """
         result = codigo
         
-        # Proteger strings de triple comilla primero
+        # 1. Arrow functions: fn(a,b) => expr
+        # fn suma(a,b) => a + b → def suma(a,b): return a + b
+        result = re.sub(
+            r'\bfn\s+(\w+)\s*\(([^)]*)\)\s*=>\s*([^\n]+)',
+            lambda m: f'def {m.group(1)}({m.group(2)}):\n    return {m.group(3)}',
+            result
+        )
+        
+        # Lambda shorthand: (a,b) => a + b
+        result = re.sub(
+            r'\(([^)]*)\)\s*=>\s*([^\n,]+)',
+            lambda m: f'lambda {m.group(1)}: {m.group(2)}',
+            result
+        )
+        
+        # 2. Range shorthand: 1..10 → range(1, 11)
+        # Soporta: 1..10, 0..n, etc.
+        result = re.sub(
+            r'(\d+)\.\.(\d+)',
+            lambda m: f'range({m.group(1)}, {int(m.group(2))+1})',
+            result
+        )
+        
+        # 3. Inline ternary extendido: ?cond: a sino: b
+        # ?x>0: x sino: 0 → x if x>0 else 0
+        result = re.sub(
+            r'\?([^:]+):\s*([^\s]+)\s+sino:\s*([^\s,;\n]+)',
+            lambda m: f'{m.group(2)} if {m.group(1)} else {m.group(3)}',
+            result
+        )
+        
+        # 4. List comprehension corta: [x p x en lista]
+        # [x*2 p x en lista] → [x*2 for x in lista]
+        result = re.sub(
+            r'\[([^\]]+)\s+p\s+(\w+)\s+en\s+([^\]]+)\]',
+            lambda m: f'[{m.group(1)} for {m.group(2)} in {m.group(3)}]',
+            result
+        )
+        
+        # 5. SQL-like query: selecciona x de lista donde x>5
+        # selecciona x de lista donde x>5 → [x for x in lista if x>5]
+        result = re.sub(
+            r'selecciona\s+(\w+)\s+de\s+(\w+)\s+donde\s+([^\n]+)',
+            lambda m: f'[{m.group(1)} for {m.group(1)} in {m.group(2)} if {m.group(3)}]',
+            result
+        )
+        
+        # 6. Pattern matching básico
+        # match x: caso 1: ... caso _: ...
+        result = re.sub(
+            r'match\s+(\w+):\s*',
+            lambda m: f'match {m.group(1)}:\n',
+            result
+        )
+        
+        # 7. Try-catch inline: codigo ! fallback
+        # resultado = risky() ! default → try: resultado = risky()\nexcept: resultado = default
+        # Solo para asignaciones simples (variable = valor)
+        result = re.sub(
+            r'(\w+\s*=\s*\w+\([^)!]*\))\s*!\s*([^\n]+)',
+            lambda m: f'try:\n    {m.group(1)}\nexcept:\n    {m.group(1).split("=")[0].strip()} = {m.group(2)}',
+            result
+        )
+        
+        # 8. Paralelo para concurrencia: paralelo para i en lista: tarea(i)
+        # paralelo para i en lista: tarea(i) → async for i in lista: await tarea(i)
+        result = re.sub(
+            r'paralelo\s+para\s+(\w+)\s+en\s+([^:]+):\s*([^\n]+)',
+            lambda m: f'async for {m.group(1)} in {m.group(2)}:\n    await {m.group(3)}',
+            result
+        )
+        
+        return result
+    
+    def _proteger(self, codigo: str) -> str:
+        """
+        Protege strings y comentarios reemplazándolos con placeholders
+        Soporta escapes: \", \', \\, \n, \t, \r, etc.
+        """
+        result = codigo
+        self.placeholders = {}
+
+        # Proteger strings de triple comilla primero (multilínea)
         def save_triple_double(m):
             key = f"__MYSTR_{uuid.uuid4().hex[:8]}__"
             self.placeholders[key] = m.group(0)
             return key
-        
+
         def save_triple_single(m):
             key = f"__MYSTR_{uuid.uuid4().hex[:8]}__"
             self.placeholders[key] = m.group(0)
             return key
-        
+
         result = re.sub(r'""".*?"""', save_triple_double, result, flags=re.DOTALL)
         result = re.sub(r"'''.*?'''", save_triple_single, result, flags=re.DOTALL)
-        
-        # Proteger strings normales
+
+        # Proteger strings con escapes manejados correctamente
+        # Pattern que maneja: "..." con escapes como \"
         def save_string_doble(m):
             key = f"__MYSTR_{uuid.uuid4().hex[:8]}__"
             self.placeholders[key] = m.group(0)
             return key
-        
+
         def save_string_simple(m):
             key = f"__MYSTR_{uuid.uuid4().hex[:8]}__"
             self.placeholders[key] = m.group(0)
             return key
-        
-        result = re.sub(r'"[^"\n]*"', save_string_doble, result)
-        result = re.sub(r"'[^'\n]*'", save_string_simple, result)
-        
-        # Proteger comentarios
+
+        # Strings dobles con escapes: "..." - maneja \" dentro del string
+        result = re.sub(r'"(?:[^"\\]|\\.)*"', save_string_doble, result)
+        # Strings simples con escapes: '...' - maneja \' dentro del string
+        result = re.sub(r"'(?:[^'\\]|\\.)*'", save_string_simple, result)
+
+        # Proteger comentarios (desde # hasta fin de línea)
         def save_comment(m):
             key = f"__MYSTR_{uuid.uuid4().hex[:8]}__"
             self.placeholders[key] = m.group(0)
             return key
-        
+
         result = re.sub(r'#[^\n]*', save_comment, result)
-        
+
         return result
     
     def _restaurar(self, codigo: str) -> str:
@@ -131,37 +243,71 @@ class TraductorMejorado:
         for placeholder, original in self.placeholders.items():
             result = result.replace(placeholder, original, 1)
         return result
-    
+
     def _traducir_keywords(self, codigo: str) -> str:
-        """Traduce keywords"""
+        """
+        Traduce keywords evitando colisiones con variables
+        Estrategia: NO traducir y, o, no automáticamente
+        Solo traducir en contextos específicos donde SON operadores
+        """
         result = codigo
+
+        # Traducir TODAS las keywords EXCEPTO y, o, no
+        keywords_seguras = {k: v for k, v in self.KEYWORD_MAP.items() 
+                          if k not in ['y', 'o', 'no']}
         
-        # Traducir keywords (ordenadas por longitud para evitar conflictos)
-        for spanish, python in sorted(self.KEYWORD_MAP.items(), key=lambda x: -len(x[0])):
+        for spanish, python in sorted(keywords_seguras.items(), key=lambda x: -len(x[0])):
             pattern = r'\b' + re.escape(spanish) + r'\b'
             result = re.sub(pattern, python, result)
-        
+
         # Manejo especial para 'definir'
         result = re.sub(r'\bdefinir\s+(\w+)\s*\(', r'def \1(', result)
         result = re.sub(r'\bdefinir\s+', '', result)
+
+        # ============================================
+        # OPERADORES LÓGICOS: y, o, no
+        # ============================================
+        # Problema: 'y' puede ser variable O operador
+        # Solución: Solo traducir en contexto de OPERADOR
         
-        # Operadores lógicos: y, o, no
-        # Solo traducir en contexto de expresión (no como variables)
-        for spanish, python in [('y', 'and'), ('o', 'or'), ('no', 'not')]:
-            if spanish == 'no':
-                # 'no' se traduce si precede a una expresión
-                pattern = r'\bno\b(?=\s*(?:verdadero|falso|nulo|[a-zA-Z_]))'
-                result = re.sub(pattern, python, result)
-            else:
-                # 'y' y 'o' se traducen solo si están entre expresiones
-                # Incluye ), ], identificadores, números, y también ( para casos como ") o ("
-                pattern = r'([\w\)])\s+' + re.escape(spanish) + r'\s+([\w\(])'
-                result = re.sub(pattern, r'\1 ' + python + r' \2', result)
+        # Contextos donde y/o SON operadores (NO variables):
+        # 1. Entre dos expresiones: expr y expr, expr o expr
+        # 2. Después de operadores de comparación: == y, != y, > y, < y
+        # 3. Dentro de condiciones: si ... y ..., mientras ... o ...
         
+        # 'y' como operador lógico AND
+        # Solo traducir si está entre expresiones válidas
+        # Patrón: algo que parece expresión + espacio + 'y' + espacio + algo que parece expresión
+        result = re.sub(
+            r'(\w|\)|\]|\d)\s+y\s+(\w|\(|\[|\d|")',
+            lambda m: m.group(1) + ' and ' + m.group(2),
+            result
+        )
+        
+        # 'o' como operador lógico OR
+        result = re.sub(
+            r'(\w|\)|\]|\d)\s+o\s+(\w|\(|\[|\d|")',
+            lambda m: m.group(1) + ' or ' + m.group(2),
+            result
+        )
+        
+        # 'no' como operador NOT - solo antes de valores booleanos o comparaciones
+        # no True, no False, no None, no variable, no (expresion)
+        result = re.sub(
+            r'\bno\s+(verdadero|falso|nulo|\w+|\()',
+            lambda m: 'not ' + m.group(1),
+            result
+        )
+        
+        # Traducir verdadero, falso, nulo (seguro, no son variables)
+        result = re.sub(r'\bverdadero\b', 'True', result)
+        result = re.sub(r'\bfalso\b', 'False', result)
+        result = re.sub(r'\bnulo\b', 'None', result)
+
         return result
     
     def _traducir_tipos(self, codigo: str) -> str:
-        """Traduce tipos de español a Python"""
+        """Traduce tipos de español a Python - SIN espacio doble"""
         tipos_map = {
             'booleano': 'bool',
             'entero': 'int',
@@ -173,9 +319,10 @@ class TraductorMejorado:
 
         resultado = codigo
         for esp, py in tipos_map.items():
-            # Traducir en contexto de tipo (después de : o ->)
+            # Pattern ya incluye \s* que consume espacios existentes
+            # NO agregar espacio extra en el reemplazo
             pattern = r'(:|->)\s*' + esp + r'\b'
-            resultado = re.sub(pattern, r'\1 ' + py, resultado)
+            resultado = re.sub(pattern, r'\1' + py, resultado)
 
         return resultado
     

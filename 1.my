@@ -1,126 +1,13 @@
-importar math como m
-importar random como r
-importar asyncio
+# Mi primer programa en My Lenguaje
 
+función principal():
+    imprimir("¡Hola desde My Lenguaje!")
+    
+    definir nombre: cadena = "Mundo"
+    imprimir(f"Hola, {nombre}!")
+    
+    # Ejemplo con bucle
+    para i en rango(5):
+        imprimir(f"Contando: {i}")
 
-función medir_tiempo(func):
-    función envoltura(*args, **kwargs):
-        inicio = 2 + 3 * 4
-        resultado = func(*args, **kwargs)
-        fin = 10 * 2
-        imprimir("Tiempo simulado:", fin - inicio)
-        retornar resultado
-    retornar envoltura
-
-
-clase Recurso:
-    función __enter__(self):
-        imprimir("Abriendo recurso")
-        retornar self
-
-    función __exit__(self, tipo, valor, traceback):
-        imprimir("Cerrando recurso")
-
-
-clase Persona:
-    función __init__(self, nombre: cadena, edad: entero):
-        self.nombre = nombre
-        self.edad = edad
-
-    función es_adulto(self) -> booleano:
-        retornar self.edad >= 18
-
-
-clase Empleado(Persona):
-    función __init__(self, nombre: cadena, edad: entero, salario: flotante):
-        Persona.__init__(self, nombre, edad)
-        self.salario = salario
-
-    función calcular_bono(self) -> flotante:
-        base = 1000 + 500 * 2
-        si verdadero y self.salario > 3000:
-            retornar base * 0.10
-        sino:
-            retornar base * 0.05
-
-
-función generar_datos(limite: entero) -> lista:
-    retornar [x*x para x en rango(limite) si x % 2 == 0]
-
-
-función mapa_cubos(limite: entero) -> dict:
-    retornar diccionario({x: x*x*x para x en rango(limite)})
-
-
-async función tarea_async(nombre: cadena):
-    imprimir("Iniciando tarea:", nombre)
-    esperar asyncio.sleep(1)
-    imprimir("Finalizando tarea:", nombre)
-
-
-función simulacion_principal():
-
-    imprimir("===== FASE 4 MEGASTRESS =====")
-
-    intentar:
-
-        nombre: cadena = entrada("Nombre: ")
-        edad: entero = entero(entrada("Edad: "))
-        salario: flotante = flotante(entrada("Salario: "))
-
-        emp = Empleado(nombre, edad, salario)
-
-        si emp.es_adulto() y no falso:
-            imprimir("Empleado adulto")
-        sino:
-            imprimir("Empleado menor")
-
-        bono = emp.calcular_bono()
-        imprimir("Bono:", bono)
-
-        datos = generar_datos(20)
-        imprimir("Datos generados:", datos)
-
-        cubos = mapa_cubos(10)
-        imprimir("Mapa cubos:", cubos)
-
-        suma: entero = 0
-        para valor en datos:
-            suma = suma + valor
-
-        promedio = suma / longitud(datos)
-        imprimir("Promedio:", promedio)
-
-        contador: entero = 0
-        mientras contador < 3:
-            interno: entero = 0
-            mientras interno < 2:
-                imprimir("Loop:", contador, interno)
-                interno = interno + 1
-            contador = contador + 1
-
-        con Recurso() como recurso:
-            imprimir("Usando recurso protegido")
-
-        numero_random: entero = r.randint(1, 100)
-
-        resultado_logico = (numero_random > 10 y numero_random < 50) o (numero_random == 100)
-        imprimir("Evaluación lógica:", resultado_logico)
-
-        imprimir("Raíz optimizable:", m.sqrt(16))
-
-    excepto:
-        imprimir("Error durante simulación")
-
-    finalmente:
-        imprimir("Simulación finalizada")
-
-
-async función main():
-    simulacion_principal()
-    esperar tarea_async("A")
-    esperar tarea_async("B")
-
-
-si __name__ == "__main__":
-    asyncio.run(main())
+principal()

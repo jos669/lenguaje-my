@@ -12,7 +12,7 @@ from .ast_nodes import (
     Condicional, BuclePara, BucleMientras, Retorno, Importacion,
     TryExcept, Asignacion, ExpresionStmt,
     BinOp, UnaryOp, Comparacion, LlamadaFuncion, Identificador,
-    AccesoAtributo, AccesoIndice,
+    AccesoAtributo, AccesoIndice, ASTNode,
     Literal, ListaLiteral, DiccionarioLiteral
 )
 
@@ -171,19 +171,46 @@ class ConstruirAST(Transformer):
         return BucleMientras(condicion=condicion, cuerpo=cuerpo)
     
     def try_except(self, children):
+        """
+        Maneja try/except/finally extrayendo correctamente el nombre de excepción
+        """
         cuerpo = []
         exceptos = []
         finalmente = None
         
-        for child in children:
+        i = 0
+        current_except_name = None
+        
+        while i < len(children):
+            child = children[i]
+            
             if isinstance(child, list):
                 if not cuerpo:
                     cuerpo = child
+                elif current_except_name:
+                    # Este es el cuerpo del except con nombre de excepción
+                    exceptos.append((current_except_name, child))
+                    current_except_name = None
                 else:
+                    # Cuerpo de except sin nombre específico
                     exceptos.append((None, child))
-            elif isinstance(child, tuple):
-                if child[0] == 'finally':
-                    finalmente = child[1]
+            
+            elif isinstance(child, Token):
+                # Verificar si es un nombre de excepción
+                if child.type == 'IDENTIFIER' and i > 0:
+                    # Verificar si viene después de 'excepto'
+                    prev_child = children[i-1]
+                    if isinstance(prev_child, str) and 'except' in prev_child.lower():
+                        current_except_name = child.value
+            
+            elif isinstance(child, str):
+                if 'finally' in child.lower():
+                    # El siguiente elemento debería ser el cuerpo de finally
+                    if i + 1 < len(children) and isinstance(children[i+1], list):
+                        finalmente = children[i+1]
+                        i += 1
+            
+            i += 1
         
         return TryExcept(cuerpo=cuerpo, exceptos=exceptos, finalmente=finalmente)
     
@@ -334,7 +361,42 @@ class ConstruirAST(Transformer):
         return ListaLiteral(elementos=elementos)
     
     def diccionario_literal(self, children):
+        """
+        Extrae pares clave-valor de un diccionario
+        Formato: { clave: valor, clave: valor }
+        """
         pares = []
+        
+        # children contiene: '{', clave1, ':', valor1, ',', clave2, ':', valor2, '}'
+        i = 0
+        while i < len(children):
+            child = children[i]
+            
+            # Saltar '{' y ','
+            if isinstance(child, str) and child in ['{', ',']:
+                i += 1
+                continue
+            
+            # Saltar '}'
+            if isinstance(child, str) and child == '}':
+                break
+            
+            # Encontrar clave
+            if isinstance(child, ASTNode):
+                clave = child
+                i += 1
+                
+                # Saltar ':'
+                if i < len(children) and isinstance(children[i], str) and children[i] == ':':
+                    i += 1
+                
+                # Encontrar valor
+                if i < len(children) and isinstance(children[i], ASTNode):
+                    valor = children[i]
+                    pares.append((clave, valor))
+            
+            i += 1
+        
         return DiccionarioLiteral(pares=pares)
 
 
@@ -374,22 +436,27 @@ class Parser:
             transformer = ConstruirAST()
             return transformer.transform(arbol)
         except UnexpectedToken as e:
+            # UnexpectedToken no siempre tiene 'context', usar hasattr
             raise ErrorSintaxis(
                 mensaje=f"Token inesperado '{e.token}'. Se esperaba uno de: {e.accepts or 'expresión'}",
-                linea=e.line,
-                columna=e.column,
-                contexto=e.context
+                linea=e.line if hasattr(e, 'line') else 0,
+                columna=e.column if hasattr(e, 'column') else 0,
+                contexto=getattr(e, 'context', str(e.token))
             )
         except UnexpectedInput as e:
+            # UnexpectedInput puede no tener todos los atributos
             raise ErrorSintaxis(
-                mensaje=f"Entrada inesperada en la posición {e.pos}",
-                linea=e.line,
-                columna=e.column,
-                contexto=e.context
+                mensaje=f"Entrada inesperada en la posición {getattr(e, 'pos', 'desconocida')}",
+                linea=getattr(e, 'line', 0),
+                columna=getattr(e, 'column', 0),
+                contexto=getattr(e, 'context', str(e))
             )
         except LarkError as e:
-            raise ErrorSintaxis(mensaje=str(e))
+            raise ErrorSintaxis(mensaje=f"Error de gramática: {str(e)}")
         except Exception as e:
+            # Log error para debugging
+            import logging
+            logging.error(f"Error interno del parser: {e}")
             raise ErrorSintaxis(mensaje=f"Error interno del parser: {e}")
     
     def parse_file(self, ruta: str):

@@ -119,21 +119,21 @@ class AplicacionWeb:
         """Agrega un middleware"""
         self.middlewares.append(func)
     
-    def _encontrar_ruta(self, metodo: str, ruta: str) -> tuple[Optional[Callable], dict]:
+    def _encontrar_ruta(self, metodo: str, ruta: str) -> tuple:
         """Encuentra la función para una ruta"""
         if metodo not in self.rutas:
             return None, {}
-        
+
         for patron, func in self.rutas[metodo].items():
-            # Convertir patrón a regex
-            patron_regex = patron.replace('<', '(?P<').replace('>', '>[^/]+)')
-            
+            # Convertir patrón a regex CORREGIDO
             import re
-            match = re.match(f'^{patron_regex}$', ruta)
+            patron_regex = re.sub(r'<(\w+)>', r'(?P<\1>[^/]+)', patron)
             
+            match = re.match(f'^{patron_regex}$', ruta)
+
             if match:
                 return func, match.groupdict()
-        
+
         return None, {}
     
     def manejar_solicitud(self, solicitud: Solicitud) -> Respuesta:

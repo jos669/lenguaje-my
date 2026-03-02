@@ -1,0 +1,113 @@
+# Ejemplo de Machine Learning en My Lenguaje - Fase 7
+# Demostración de varios algoritmos ML
+
+desde core importar (
+    crear_regresion_lineal, crear_kmeans, crear_knn,
+    evaluar_precision, dividir_datos
+)
+
+función generar_datos_aleatorios(cantidad, minimo, maximo):
+    """Genera datos aleatorios"""
+    datos = lista([])
+    para i en rango(cantidad):
+        x = (i * 2) + 5 + (i % 3)
+        y = x * 2 + 3
+        datos.append([x, y])
+    retornar datos
+
+
+función regresion_lineal_demo():
+    """Demo de regresión lineal"""
+    imprimir("\n📈 Regresión Lineal")
+    imprimir("-" * 50)
+    
+    modelo = crear_regresion_lineal()
+    
+    # Datos de ejemplo
+    X = [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]]
+    y = [2.1, 3.9, 6.2, 8.1, 9.8, 12.2, 14.1, 16.0, 17.9, 20.1]
+    
+    imprimir("Ajustando modelo...")
+    modelo.ajustar(X, y)
+    
+    coeficientes = modelo.obtener_coeficientes()
+    imprimir(f"  Pendiente: {coeficientes['coeficientes'][0]:.4f}")
+    imprimir(f"  Intercepto: {coeficientes['intercepto']:.4f}")
+    imprimir(f"  R²: {coeficientes['r_cuadrado']:.4f}")
+    
+    # Predecir
+    X_nuevo = [[11], [12], [13]]
+    predicciones = modelo.predecir(X_nuevo)
+    
+    imprimir("\nPredicciones:")
+    para i en rango(longitud(X_nuevo)):
+        imprimir(f"  X={X_nuevo[i][0]} → y={predicciones[i]:.2f}")
+
+
+función kmeans_demo():
+    """Demo de K-Means clustering"""
+    imprimir("\n🔵 K-Means Clustering")
+    imprimir("-" * 50)
+    
+    kmeans = crear_kmeans(k=3, iteraciones=50)
+    
+    # Datos de ejemplo (agrupados en 3 clusters)
+    datos = [
+        [1, 2], [1.5, 1.8], [1.2, 2.2], [0.8, 1.9],
+        [5, 8], [5.5, 7.8], [5.2, 8.2], [4.8, 7.9],
+        [9, 2], [9.5, 1.8], [9.2, 2.2], [8.8, 1.9]
+    ]
+    
+    imprimir("Agrupando datos en 3 clusters...")
+    etiquetas = kmeans.ajustar_predecir(datos)
+    
+    imprimir(f"\nCentroides encontrados:")
+    para i en rango(longitud(kmeans.centroides)):
+        c = kmeans.centroides[i]
+        imprimir(f"  Cluster {i}: [{c[0]:.2f}, {c[1]:.2f}]")
+    
+    imprimir("\nAsignación de clusters:")
+    para i en rango(longitud(datos)):
+        imprimir(f"  {datos[i]} → Cluster {etiquetas[i]}")
+
+
+función knn_demo():
+    """Demo de K-Nearest Neighbors"""
+    imprimir("\n🎯 K-Nearest Neighbors")
+    imprimir("-" * 50)
+    
+    knn = crear_knn(k=3)
+    
+    # Datos de entrenamiento
+    X_train = [
+        [1, 2], [1.5, 1.8], [2, 2],
+        [5, 8], [5.5, 7.8], [6, 8],
+        [9, 2], [9.5, 1.8], [10, 2]
+    ]
+    y_train = [0, 0, 0, 1, 1, 1, 2, 2, 2]
+    
+    imprimir("Entrenando KNN...")
+    knn.ajustar(X_train, y_train)
+    
+    # Datos de prueba
+    X_test = [[1.2, 1.9], [5.5, 8], [9.2, 2]]
+    
+    imprimir("\nClasificaciones:")
+    predicciones = knn.predecir(X_test)
+    para i en rango(longitud(X_test)):
+        imprimir(f"  {X_test[i]} → Clase {predicciones[i]}")
+
+
+función principal():
+    imprimir("🤖 Machine Learning - Demo Fase 7")
+    imprimir("=" * 50)
+    
+    regresion_lineal_demo()
+    kmeans_demo()
+    knn_demo()
+    
+    imprimir("\n" + "=" * 50)
+    imprimir("✅ Demo de ML completada exitosamente")
+
+
+principal()

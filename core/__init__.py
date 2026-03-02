@@ -1,6 +1,6 @@
 """
-My Lenguaje - Core (Fase 6)
-Módulo principal con todas las características enterprise
+My Lenguaje - Core (Fase 8 - Ultimate Edition)
+Módulo principal con todas las características enterprise + IA/ML/NLP + Advanced Features
 """
 
 # Fase 1-5
@@ -23,6 +23,61 @@ from .docs import GeneradorDocumentacion, generar_documentacion
 from .logging import Logger, configurar_logging, obtener_logger
 from .logging import debug, info, advertencia, error, critico
 from .web import AplicacionWeb, Solicitud, Respuesta, crear_aplicacion
+
+# Fase 7 - AI/ML/NLP
+from .ai import (
+    RedNeuronal, Neurona, Capa, FuncionActivacion,
+    ClasificadorIA, AgenteIA,
+    crear_red, cargar_modelo, entrenar_clasificador,
+    red_neuronal, entrenar, predecir, guardar_modelo, cargar_modelo_ia,
+    inicializar_ia
+)
+from .ml import (
+    RegresionLineal, RegresionLogistica, KMeans, KNN,
+    ArbolDecision, RandomForest,
+    crear_regresion_lineal, crear_regresion_logistica,
+    crear_kmeans, crear_knn, crear_arbol, crear_random_forest,
+    evaluar_precision, evaluar_mse, dividir_datos
+)
+from .nlp import (
+    Tokenizador, Stemmer, AnalizadorSentimiento,
+    ExtractorPalabrasClave, ChatbotBasico, Token, Documento,
+    STOPWORDS_ES,
+    tokenizar, stemmear, analizar_sentimiento,
+    extraer_palabras_clave, crear_chatbot, conversar
+)
+
+# Fase 8 - Advanced Features
+from .database import (
+    ORM, Conexion, QueryBuilder, Modelo, Campo,
+    ModeloManager, ErrorBaseDeDatos,
+    conectar_base_de_datos, crear_modelo, ejecutar_migraciones,
+    modelo, campo
+)
+from .plugins import (
+    GestorPlugins, PluginBase, MetadataPlugin, ErrorPlugin,
+    inicializar_plugins, obtener_gestor, cargar_plugin, ejecutar_hook,
+    hook, evento, PluginEjemplo
+)
+from .distributed import (
+    Distribuidor, ColaTareas, Tarea, Worker, EstadoTarea,
+    BalanceadorCarga,
+    crear_distribuidor, ejecutar_paralelo, procesar_lote,
+    mapear, reducir
+)
+from .cache import (
+    Caché, CachéDisco, EntradaCaché,
+    LRUStrategy, LFUStrategy, TTLEstrategy,
+    en_caché, obtener_cache_global,
+    cache_establecer, cache_obtener, cache_eliminar, cache_limpiar
+)
+from .advanced_debug import (
+    DepuradorAvanzado, AnalizadorMemoria, FrameInfo,
+    Breakpoint, Watchpoint, TraceEntry,
+    tracear, medir_tiempo, detectar_recursion,
+    perfilar, monitor_memoria,
+    obtener_depurador, breakpoint, watch, obtener_trace
+)
 
 
 class Traductor:

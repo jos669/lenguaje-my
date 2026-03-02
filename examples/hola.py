@@ -1,5 +1,5 @@
-# Ejemplo básico in My Lenguaje
-# Guarda este archivo as hola.my
+# Ejemplo básico en My Lenguaje
+# Guarda este archivo como hola.my
 
 # Variables
 saludo = "Hola Mundo"
@@ -15,15 +15,15 @@ print(saludar("Mundo"))
 
 # Condicional
 if contador == 0:
-    print("Contador in cero")
+    print("Contador en cero")
 else:
     print("Contador mayor a cero")
 
-# Bucle for
+# Bucle para
 for i in range(5):
     print("Iteración: " + str(i))
 
-# Bucle while
+# Bucle mientras
 while contador < 3:
     print("Contando: " + str(contador))
     contador = contador + 1
@@ -35,9 +35,9 @@ class Persona:
         self.edad = edad
     
     def presentarse(self):
-        return "Soy " + self.nombre + " and tengo " + str(self.edad) + " años"
+        return "Soy " + self.nombre + " y tengo " + str(self.edad) + " años"
 
-# Usar la class
+# Usar la clase
 persona1 = Persona("Ana", 25)
 print(persona1.presentarse())
 
@@ -49,7 +49,7 @@ print("Longitud: " + str(len(numeros)))
 # Operadores lógicos
 x = 10
 if x > 5 and x < 15:
-    print("x está in el range correcto")
+    print("x está en el rango correcto")
 
 # Manejo de errores
 try:
@@ -57,6 +57,6 @@ try:
 except:
     print("¡Error detectado!")
 finally:
-    print("Bloque finally ejecutado")
+    print("Bloque finalmente ejecutado")
 
 print("¡Programa terminado!")
